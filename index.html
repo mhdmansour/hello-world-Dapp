@@ -29,15 +29,15 @@
     <h1>Welcome!</h1>
     <p>Here we can read and update the message:</p>
     
-    <input type="text" id="mood" />
+    <input type="text" id="message" />
 
     <button id="updateButton" onclick="update()">update</button>
 
     <p></p>
    
     <button id="readButton" onclick="read()">read</button>
-    <input type="text" id="mood1" readonly/>
-    <p id="showMood"></p>
+    <input type="text" id="message1" readonly/>
+    <p id="showMessage"></p>
   </div>
 
   <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js" type="application/javascript"></script>
@@ -117,7 +117,7 @@
       const updateButton = document.getElementById('updateButton');
       const originalText = updateButton.textContent;
       updateButton.textContent = 'Loading...';
-      const newMessage = document.getElementById("mood").value;
+      const newMessage = document.getElementById("message").value;
       const tx = await helloWorldContract.update(newMessage);
       await tx.wait();
       updateButton.textContent = originalText;
@@ -129,7 +129,7 @@
       const originalText = readButton.textContent;
       readButton.textContent = 'Loading...';
       const message = await helloWorldContract.message();
-      document.getElementById("mood1").value = message;
+      document.getElementById("message1").value = message;
       readButton.textContent = originalText;
       console.log('The message is: ' + message);
     }
