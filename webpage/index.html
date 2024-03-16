@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LearnWeb3 First dApp</title>
+  <style>
+    body {
+      text-align: center;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    div {
+      width: 20%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    button {
+      width: 100%;
+      margin: 10px 0px 5px 0px;
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <h1>Welcome!</h1>
+    <p>Here we can read and update the message:</p>
+    
+    <input type="text" id="mood" />
+
+    <button id="updateButton" onclick="update()">update</button>
+
+    <p></p>
+   
+    <button id="readButton" onclick="read()">read</button>
+    <input type="text" id="mood1" readonly/>
+    <p id="showMood"></p>
+  </div>
+
+  <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js" type="application/javascript"></script>
+  <script>
+    const API_URL = "https://eth-sepolia.g.alchemy.com/v2/hcjKdJBEv4LpTCQoitxUOf33JUKpBYg0";
+    const PRIVATE_KEY = "a293afda79888af36d13db7234dad94c3129b1cec6b66dfc75990075f9d1376c";
+    const CONTRACT_ADDRESS = "0x835D8C85e67335146fC1ef527ed483E8eF76afC3";
+
+    const contractABI = [
+      {
+        "inputs": [
+          {
+            "internalType": "string",
+            "name": "initMessage",
+            "type": "string"
+          }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "internalType": "string",
+            "name": "oldStr",
+            "type": "string"
+          },
+          {
+            "indexed": false,
+            "internalType": "string",
+            "name": "newStr",
+            "type": "string"
+          }
+        ],
+        "name": "UpdatedMessages",
+        "type": "event"
+      },
+      {
+        "inputs": [],
+        "name": "message",
+        "outputs": [
+          {
+            "internalType": "string",
+            "name": "",
+            "type": "string"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "string",
+            "name": "newMessage",
+            "type": "string"
+          }
+        ],
+        "name": "update",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      }
+    ];
+
+    const alchemyProvider = new ethers.providers.JsonRpcProvider(API_URL);
+    const signer = new ethers.Wallet(PRIVATE_KEY, alchemyProvider);
+    const helloWorldContract = new ethers.Contract(
+      CONTRACT_ADDRESS,
+      contractABI,
+      signer
+    );
+
+    async function update() {
+      const updateButton = document.getElementById('updateButton');
+      const originalText = updateButton.textContent;
+      updateButton.textContent = 'Loading...';
+      const newMessage = document.getElementById("mood").value;
+      const tx = await helloWorldContract.update(newMessage);
+      await tx.wait();
+      updateButton.textContent = originalText;
+      console.log('Done');
+    }
+
+    async function read() {
+      const readButton = document.getElementById('readButton');
+      const originalText = readButton.textContent;
+      readButton.textContent = 'Loading...';
+      const message = await helloWorldContract.message();
+      document.getElementById("mood1").value = message;
+      readButton.textContent = originalText;
+      console.log('The message is: ' + message);
+    }
+  </script>
+</body>
+</html>
